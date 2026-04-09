@@ -1,49 +1,114 @@
 # PhishSense
 
-PhishSense is an AI-assisted phishing email analysis web app built with **FastAPI**, **Gemini**, and **plain HTML/CSS/JavaScript**.
+PhishSense is a phishing email analysis web app that combines rule-based threat detection with AI-generated explanations. It is designed to help users quickly assess suspicious emails by analyzing sender details, message content, embedded links, and common phishing indicators.
 
-It combines a **rule-based phishing scoring engine** with an **AI explanation layer** to help users understand why an email may be suspicious.
+This project was built as a portfolio piece to demonstrate practical cybersecurity knowledge, backend API development, frontend integration, and applied AI usage in a real-world security context.
+
+---
 
 ## Features
 
-- Analyze suspicious emails through a simple web interface
-- Generate a phishing score from **0 to 100**
-- Classify risk as **Low**, **Medium**, or **High**
-- Detect common phishing indicators such as:
-  - urgent pressure language
-  - credential harvesting language
-  - suspicious sender domains
-  - shortened URLs
+- Analyze suspicious email content for phishing indicators
+- Detect common red flags such as:
+  - urgent or threatening language
+  - credential harvesting attempts
+  - financial bait
+  - mismatched sender and URL domains
   - suspicious top-level domains
-- Generate a plain-English explanation using Gemini
-- Recommend a safe next action
-- Includes sample phishing and safe email examples
+  - shortened links
+  - numeric or deceptive-looking domains
+  - suspicious attachment wording
+- Generate a phishing risk score
+- Classify results into Low, Medium, or High risk
+- Display rule-based findings clearly
+- Generate AI-powered explanations using Gemini API
+- Use sample phishing and legitimate email examples for quick testing
+
+---
+
+## Why I Built This
+
+Phishing remains one of the most common and effective cyberattack methods. I built PhishSense to explore how a lightweight phishing triage tool could combine deterministic security rules with AI-generated explanation to help users understand *why* an email may be suspicious.
+
+This project also gave me a chance to apply skills in:
+
+- cybersecurity analysis
+- Python backend development
+- FastAPI REST API design
+- JavaScript frontend development
+- API integration
+- UI/UX design for security tools
+
+---
 
 ## Tech Stack
 
-- **Backend:** FastAPI
-- **Frontend:** HTML, CSS, JavaScript
-- **AI:** Gemini API
-- **Testing:** Pytest
+**Backend**
+- Python
+- FastAPI
+- Uvicorn
+
+**Frontend**
+- HTML
+- CSS
+- JavaScript
+
+**AI Integration**
+- Google Gemini API
+
+---
+
+## How It Works
+
+1. The user enters:
+   - sender email
+   - subject line
+   - message body
+   - embedded URL
+
+2. The backend applies a set of phishing detection rules to identify suspicious patterns.
+
+3. Each detected indicator contributes to a total phishing risk score.
+
+4. The application classifies the email as:
+   - **Low Risk**
+   - **Medium Risk**
+   - **High Risk**
+
+5. Gemini generates a human-readable explanation summarizing why the email may be suspicious.
+
+---
+
+## Example Detection Indicators
+
+PhishSense checks for patterns such as:
+
+- pressure tactics like “urgent” or “immediately”
+- requests to verify accounts or reset passwords
+- suspicious payment or invoice language
+- shortened URLs
+- mismatched sender and destination domains
+- suspicious TLDs
+- domains containing misleading numbers
+- suspicious wording related to attachments
+
+---
 
 ## Project Structure
 
-```text
+```bash
 PhishSense/
-├── app/
-│   ├── ai_analysis.py
-│   ├── main.py
-│   ├── schemas.py
-│   ├── scoring.py
-│   ├── utils.py
-│   └── templates/
-│       └── index.html
-├── static/
-│   ├── app.js
-│   └── style.css
-├── tests/
-│   └── test_scoring.py
-├── .env
-├── .gitignore
-├── README.md
-└── requirements.txt
+│── backend/
+│   ├── app.py
+│   ├── detector.py
+│   ├── ai_explainer.py
+│   └── tests/
+│
+│── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+│
+│── .env.example
+│── requirements.txt
+│── README.md
