@@ -141,3 +141,18 @@ pip install -r requirements.txt
 ```bash
 GEMINI_API_KEY=your_api_key_here
 ```
+---
+
+## Running the Project
+
+1. Start the backend
+```bash
+cd ~/PhishSense
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+2. The backend should now be available at:
+```bash
+http://127.0.0.1:8000
+```
