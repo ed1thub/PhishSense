@@ -1,11 +1,10 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi import Request
 
 from app.ai_analysis import generate_ai_explanation
 from app.schemas import AnalysisResult, EmailInput
@@ -23,11 +22,7 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={}
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post("/analyze", response_model=AnalysisResult)
