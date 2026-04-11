@@ -5,4 +5,3 @@ python-multipart
 python-dotenv
 google-genai
 pytest
-google-generativeai

@@ -1,4 +1,5 @@
 import re
+from typing import Any, Dict, List
 from urllib.parse import urlparse
 
 
@@ -56,14 +57,14 @@ def extract_domain(value: str) -> str:
     return value
 
 
-def contains_pattern(text: str, patterns: list[str]) -> bool:
+def contains_pattern(text: str, patterns: List[str]) -> bool:
     lowered = text.lower()
     return any(re.search(pattern, lowered) for pattern in patterns)
 
 
-def analyze_email(sender: str, subject: str, body: str, url: str) -> dict:
+def analyze_email(sender: str, subject: str, body: str, url: str) -> Dict[str, Any]:
     score = 0
-    red_flags: list[str] = []
+    red_flags: List[str] = []
 
     combined = f"{subject}\n{body}"
 

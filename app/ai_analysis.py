@@ -1,7 +1,7 @@
 import os
+from typing import List
 
 from dotenv import load_dotenv
-from google import genai
 
 load_dotenv()
 
@@ -13,13 +13,16 @@ def generate_ai_explanation(
     url: str,
     score: int,
     risk_level: str,
-    red_flags: list[str],
+    red_flags: List[str],
 ) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return "Gemini API key not found. Add GEMINI_API_KEY to your .env file."
 
     try:
+        # Import lazily so SDK issues don't crash application startup.
+        from google import genai
+
         client = genai.Client(api_key=api_key)
 
         flags_text = "\n- ".join(red_flags)

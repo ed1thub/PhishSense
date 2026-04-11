@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 
 class EmailInput(BaseModel):
@@ -11,6 +12,6 @@ class EmailInput(BaseModel):
 class AnalysisResult(BaseModel):
     score: int
     risk_level: str
-    red_flags: list[str]
+    red_flags: List[str]
     ai_explanation: str
     recommended_action: str
