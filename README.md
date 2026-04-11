@@ -1,98 +1,30 @@
 # PhishSense
 
-PhishSense is a FastAPI-powered phishing email analyzer that combines rule-based scoring with AI-generated explanations.
+PhishSense is a student-built web app that analyzes suspicious emails using rule-based phishing detection plus AI-generated explanations.
 
-Paste an email sender, subject, body, and optional URL, then PhishSense returns:
+## What It Does
 
-- a phishing score out of 100
-- a risk label (Low, Medium, High)
-- detected red flags
-- a recommended action
-- an AI explanation powered by Gemini
+- Scores emails from 0 to 100 based on phishing indicators
+- Labels risk as Low, Medium, or High
+- Shows detected red flags
+- Suggests a safe next action
+- Generates a plain-English explanation with Gemini
 
-## Features
+## Built With
 
-- Rule-based phishing detection engine
-- AI explanation generation using Google Gemini (gemini-2.5-flash)
-- Clear risk visualization in a modern web UI
-- Built-in sample phishing and safe email examples
-- JSON API endpoint for programmatic use
+- Python, FastAPI, Uvicorn
+- HTML, CSS, JavaScript
+- Google Gen AI SDK (Gemini)
 
-## Detection Signals
-
-PhishSense currently checks for:
-
-- urgent pressure language
-- credential-harvesting terms
-- financial bait language
-- sender domain with numeric lookalike patterns
-- URL shortener usage
-- sender and URL domain mismatch
-- suspicious TLDs (.ru, .xyz, .top, .click, .shop)
-- excessive punctuation
-- suspicious attachment/download wording
-
-## Tech Stack
-
-- Python
-- FastAPI + Uvicorn
-- Jinja2 templates + static HTML/CSS/JavaScript frontend
-- python-dotenv for environment variables
-- Google Gen AI SDK (google-genai)
-- Pytest for tests
-
-## Project Structure
-
-```text
-PhishSense/
-├── app/
-│   ├── ai_analysis.py
-│   ├── main.py
-│   ├── schemas.py
-│   ├── scoring.py
-│   └── templates/
-│       └── index.html
-├── static/
-│   ├── app.js
-│   └── style.css
-├── tests/
-│   └── test_scoring.py
-├── requirements.txt
-└── README.md
-```
-
-## Getting Started (Local)
-
-### 1. Clone
+## Quick Start
 
 ```bash
 git clone https://github.com/<your-username>/PhishSense.git
 cd PhishSense
-```
-
-### 2. Create and activate a virtual environment
-
-Linux/macOS:
-
-```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-Windows (PowerShell):
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
-
-### 4. Configure environment variables
 
 Create a `.env` file in the project root:
 
@@ -100,80 +32,33 @@ Create a `.env` file in the project root:
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-If `GEMINI_API_KEY` is missing, rule-based analysis still works and the app will return a fallback AI message.
-
-### 5. Run the app
+Run locally:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Open:
+Open `http://127.0.0.1:8000`.
 
-```text
-http://127.0.0.1:8000
-```
-
-## API
-
-### Endpoint
-
-`POST /analyze`
-
-### Request body
-
-```json
-{
-   "sender": "support@micros0ft-login.com",
-   "subject": "Urgent: Verify your account now",
-   "body": "Your account has been suspended...",
-   "url": "https://bit.ly/security-check"
-}
-```
-
-### Response body
-
-```json
-{
-   "score": 80,
-   "risk_level": "High",
-   "red_flags": [
-      "Urgent pressure language detected",
-      "Credential or account verification language detected"
-   ],
-   "ai_explanation": "This email appears suspicious because...",
-   "recommended_action": "Do not click links or reply. Verify the message through the sender's official website or support channel."
-}
-```
-
-## Run Tests
-
-```bash
-PYTHONPATH=. pytest -q
-```
-
-## Deploy on Render
-
-Use a Render Web Service with these settings:
+## Render Deployment
 
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Required env var: `GEMINI_API_KEY`
 
-Add environment variable in Render:
+## Student Project Notice
 
-- `GEMINI_API_KEY=<your_key>`
+This project is for educational and portfolio purposes.
 
-After deploy:
+- It is not a production-grade security product.
+- Results are advisory and may include false positives or false negatives.
+- Always verify high-risk messages through official channels.
 
-- test home page load
-- run one `/analyze` request from the UI
-- confirm no 500 errors in logs
+## Docs
 
-## Notes
-
-- The UI escapes API output before rendering to reduce XSS risk.
-- Gemini import is lazy-loaded to avoid startup crashes if the AI SDK has runtime issues.
+- Full technical docs: `DEVELOPER_README.md`
+- Deployment notes: `DEPLOYMENT.md`
 
 ## License
 
-Add your preferred license (MIT, Apache-2.0, etc.) in this repository.
+This project is licensed under the MIT License. See `LICENSE`.
