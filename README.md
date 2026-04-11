@@ -1,158 +1,179 @@
 # PhishSense
 
-PhishSense is a phishing email analysis web app that combines rule-based threat detection with AI-generated explanations. It is designed to help users quickly assess suspicious emails by analyzing sender details, message content, embedded links, and common phishing indicators.
+PhishSense is a FastAPI-powered phishing email analyzer that combines rule-based scoring with AI-generated explanations.
 
-This project was built as a portfolio piece to demonstrate practical cybersecurity knowledge, backend API development, frontend integration, and applied AI usage in a real-world security context.
+Paste an email sender, subject, body, and optional URL, then PhishSense returns:
 
----
+- a phishing score out of 100
+- a risk label (Low, Medium, High)
+- detected red flags
+- a recommended action
+- an AI explanation powered by Gemini
 
 ## Features
 
-- Analyze suspicious email content for phishing indicators
-- Detect common red flags such as:
-  - urgent or threatening language
-  - credential harvesting attempts
-  - financial bait
-  - mismatched sender and URL domains
-  - suspicious top-level domains
-  - shortened links
-  - numeric or deceptive-looking domains
-  - suspicious attachment wording
-- Generate a phishing risk score
-- Classify results into Low, Medium, or High risk
-- Display rule-based findings clearly
-- Generate AI-powered explanations using Gemini API
-- Use sample phishing and legitimate email examples for quick testing
+- Rule-based phishing detection engine
+- AI explanation generation using Google Gemini (gemini-2.5-flash)
+- Clear risk visualization in a modern web UI
+- Built-in sample phishing and safe email examples
+- JSON API endpoint for programmatic use
 
----
+## Detection Signals
 
-## Why I Built This
+PhishSense currently checks for:
 
-Phishing remains one of the most common and effective cyberattack methods. I built PhishSense to explore how a lightweight phishing triage tool could combine deterministic security rules with AI-generated explanation to help users understand *why* an email may be suspicious.
-
-This project also gave me a chance to apply skills in:
-
-- cybersecurity analysis
-- Python backend development
-- FastAPI REST API design
-- JavaScript frontend development
-- API integration
-- UI/UX design for security tools
-
----
+- urgent pressure language
+- credential-harvesting terms
+- financial bait language
+- sender domain with numeric lookalike patterns
+- URL shortener usage
+- sender and URL domain mismatch
+- suspicious TLDs (.ru, .xyz, .top, .click, .shop)
+- excessive punctuation
+- suspicious attachment/download wording
 
 ## Tech Stack
 
-**Backend**
 - Python
-- FastAPI
-- Uvicorn
-
-**Frontend**
-- HTML
-- CSS
-- JavaScript
-
-**AI Integration**
-- Google Gemini API
-
----
-
-## How It Works
-
-1. The user enters:
-   - sender email
-   - subject line
-   - message body
-   - embedded URL
-
-2. The backend applies a set of phishing detection rules to identify suspicious patterns.
-
-3. Each detected indicator contributes to a total phishing risk score.
-
-4. The application classifies the email as:
-   - **Low Risk**
-   - **Medium Risk**
-   - **High Risk**
-
-5. Gemini generates a human-readable explanation summarizing why the email may be suspicious.
-
----
-
-## Example Detection Indicators
-
-PhishSense checks for patterns such as:
-
-- pressure tactics like “urgent” or “immediately”
-- requests to verify accounts or reset passwords
-- suspicious payment or invoice language
-- shortened URLs
-- mismatched sender and destination domains
-- suspicious TLDs
-- domains containing misleading numbers
-- suspicious wording related to attachments
-
----
+- FastAPI + Uvicorn
+- Jinja2 templates + static HTML/CSS/JavaScript frontend
+- python-dotenv for environment variables
+- Google Gen AI SDK (google-genai)
+- Pytest for tests
 
 ## Project Structure
 
-```bash
+```text
 PhishSense/
-│── backend/
-│   ├── app.py
-│   ├── detector.py
-│   ├── ai_explainer.py
-│   └── tests/
-│
-│── frontend/
-│   ├── index.html
-│   ├── styles.css
-│   └── script.js
-│
-│── .env.example
-│── requirements.txt
-│── README.md
+├── app/
+│   ├── ai_analysis.py
+│   ├── main.py
+│   ├── schemas.py
+│   ├── scoring.py
+│   └── templates/
+│       └── index.html
+├── static/
+│   ├── app.js
+│   └── style.css
+├── tests/
+│   └── test_scoring.py
+├── requirements.txt
+└── README.md
 ```
----
 
-## Installation
+## Getting Started (Local)
 
-1. Clone the repository
+### 1. Clone
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/PhishSense.git
+git clone https://github.com/<your-username>/PhishSense.git
 cd PhishSense
 ```
-2. Create and activate a virtual environment
-- Windows
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-- macOS / Linux
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-4. Set up environment variables
-```bash
-GEMINI_API_KEY=your_api_key_here
-```
----
 
-## Running the Project
+### 2. Create and activate a virtual environment
 
-1. Start the backend
+Linux/macOS:
+
 ```bash
-cd ~/PhishSense
+python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+If `GEMINI_API_KEY` is missing, rule-based analysis still works and the app will return a fallback AI message.
+
+### 5. Run the app
+
+```bash
 uvicorn app.main:app --reload
 ```
-2. The backend should now be available at:
-```bash
+
+Open:
+
+```text
 http://127.0.0.1:8000
 ```
+
+## API
+
+### Endpoint
+
+`POST /analyze`
+
+### Request body
+
+```json
+{
+   "sender": "support@micros0ft-login.com",
+   "subject": "Urgent: Verify your account now",
+   "body": "Your account has been suspended...",
+   "url": "https://bit.ly/security-check"
+}
+```
+
+### Response body
+
+```json
+{
+   "score": 80,
+   "risk_level": "High",
+   "red_flags": [
+      "Urgent pressure language detected",
+      "Credential or account verification language detected"
+   ],
+   "ai_explanation": "This email appears suspicious because...",
+   "recommended_action": "Do not click links or reply. Verify the message through the sender's official website or support channel."
+}
+```
+
+## Run Tests
+
+```bash
+PYTHONPATH=. pytest -q
+```
+
+## Deploy on Render
+
+Use a Render Web Service with these settings:
+
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+Add environment variable in Render:
+
+- `GEMINI_API_KEY=<your_key>`
+
+After deploy:
+
+- test home page load
+- run one `/analyze` request from the UI
+- confirm no 500 errors in logs
+
+## Notes
+
+- The UI escapes API output before rendering to reduce XSS risk.
+- Gemini import is lazy-loaded to avoid startup crashes if the AI SDK has runtime issues.
+
+## License
+
+Add your preferred license (MIT, Apache-2.0, etc.) in this repository.
