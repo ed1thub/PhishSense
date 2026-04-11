@@ -112,3 +112,22 @@ PhishSense/
 │── .env.example
 │── requirements.txt
 │── README.md
+```
+---
+
+## Installation
+
+1. Clone the repository
+git clone https://github.com/YOUR_USERNAME/PhishSense.git
+cd PhishSense
+2. Create and activate a virtual environment
+- Windows
+python -m venv venv
+venv\Scripts\activate
+- macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+3. Install dependencies
+pip install -r requirements.txt
+4. Set up environment variables
+GEMINI_API_KEY=your_api_key_here
