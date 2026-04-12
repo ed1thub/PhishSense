@@ -114,6 +114,19 @@ textarea:focus {
     background: #ffffff;
 }
 
+input.field-invalid,
+textarea.field-invalid {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.16);
+}
+
+.field-error {
+    margin: 6px 0 0;
+    color: #b91c1c;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 textarea {
     resize: vertical;
 }

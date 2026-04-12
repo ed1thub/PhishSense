@@ -8,6 +8,13 @@ const subjectInput = document.getElementById("subject");
 const urlInput = document.getElementById("url");
 const bodyInput = document.getElementById("body");
 
+const fieldMap = {
+    sender: senderInput,
+    subject: subjectInput,
+    url: urlInput,
+    body: bodyInput,
+};
+
 const samples = {
     phishing: {
         sender: "support@micros0ft-login.com",
@@ -66,6 +73,60 @@ function renderError(message) {
     `;
 }
 
+function clearFieldErrors() {
+    Object.values(fieldMap).forEach(input => {
+        input.classList.remove("field-invalid");
+        input.removeAttribute("aria-invalid");
+
+        const feedback = document.getElementById(`${input.id}-error`);
+        if (feedback) {
+            feedback.remove();
+        }
+    });
+}
+
+function renderFieldError(fieldName, message) {
+    const input = fieldMap[fieldName];
+    if (!input) {
+        return;
+    }
+
+    input.classList.add("field-invalid");
+    input.setAttribute("aria-invalid", "true");
+
+    const feedback = document.createElement("p");
+    feedback.id = `${input.id}-error`;
+    feedback.className = "field-error";
+    feedback.textContent = message;
+
+    input.insertAdjacentElement("afterend", feedback);
+}
+
+function parseValidationErrors(detail) {
+    if (!Array.isArray(detail)) {
+        return [];
+    }
+
+    return detail
+        .map(item => {
+            if (!item || !Array.isArray(item.loc) || item.loc.length < 2) {
+                return null;
+            }
+
+            const fieldName = item.loc[item.loc.length - 1];
+            if (typeof fieldName !== "string" || !fieldMap[fieldName]) {
+                return null;
+            }
+
+            const message = typeof item.msg === "string"
+                ? item.msg.replace(/^Value error,\s*/i, "")
+                : "Invalid value";
+
+            return { fieldName, message };
+        })
+        .filter(Boolean);
+}
+
 function renderResults(data) {
     const badgeClass = data.risk_level.toLowerCase();
     const flagsHtml = data.red_flags
@@ -122,6 +183,7 @@ sampleButtons.forEach(button => {
 });
 
 clearBtn.addEventListener("click", () => {
+    clearFieldErrors();
     senderInput.value = "";
     subjectInput.value = "";
     urlInput.value = "";
@@ -131,6 +193,8 @@ clearBtn.addEventListener("click", () => {
 });
 
 analyzeBtn.addEventListener("click", async () => {
+    clearFieldErrors();
+
     const sender = senderInput.value.trim();
     const subject = subjectInput.value.trim();
     const body = bodyInput.value.trim();
@@ -151,6 +215,23 @@ analyzeBtn.addEventListener("click", async () => {
             },
             body: JSON.stringify({ sender, subject, body, url })
         });
+
+        if (response.status === 422) {
+            const validationPayload = await response.json();
+            const validationErrors = parseValidationErrors(validationPayload.detail);
+
+            if (validationErrors.length) {
+                validationErrors.forEach(({ fieldName, message }) => {
+                    renderFieldError(fieldName, message);
+                });
+
+                renderError("Please fix the highlighted fields and try again.");
+                return;
+            }
+
+            renderError("Your input contains invalid values.");
+            return;
+        }
 
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);

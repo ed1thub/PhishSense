@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import os
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
+
+from app.settings import get_settings
 
 try:
     import yaml
 except ImportError:  # pragma: no cover - dependency is listed in requirements.txt
     yaml = None
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_URGENT_PATTERNS = (
@@ -107,10 +112,15 @@ def _load_yaml_rules(path: Path) -> Mapping[str, Any]:
     if not path.exists():
         return {}
     if yaml is None:
-        raise RuntimeError("PyYAML is required to load rule config from YAML files.")
+        logger.warning("Skipping YAML rules file because PyYAML is unavailable", extra={"path": str(path)})
+        return {}
 
-    with path.open("r", encoding="utf-8") as file_handle:
-        data = yaml.safe_load(file_handle)
+    try:
+        with path.open("r", encoding="utf-8") as file_handle:
+            data = yaml.safe_load(file_handle)
+    except Exception:
+        logger.exception("Failed to load YAML rules file", extra={"path": str(path)})
+        return {}
 
     if isinstance(data, dict):
         return data
@@ -118,7 +128,8 @@ def _load_yaml_rules(path: Path) -> Mapping[str, Any]:
 
 
 def load_rule_config() -> RuleConfig:
-    yaml_path = os.getenv("PHISHSENSE_RULES_FILE")
+    settings = get_settings()
+    yaml_path = settings.rules_file
     config_source: Mapping[str, Any] = {}
 
     if yaml_path:

@@ -37,6 +37,12 @@ Optional phishing rule tuning:
 - Set `PHISHSENSE_RULES_FILE` to a YAML file, or edit [app/scoring_rules/rules.yaml](app/scoring_rules/rules.yaml#L1)
 - Override individual values with env vars like `PHISHSENSE_URGENT_PATTERNS`, `PHISHSENSE_SCORE_CAP`, or `PHISHSENSE_HIGH_RISK_THRESHOLD`
 
+Runtime settings:
+
+- `PHISHSENSE_LOG_LEVEL` controls backend logging level (default: `INFO`)
+- `PHISHSENSE_GEMINI_MODEL` selects the model used for AI explanations (default: `gemini-2.5-flash`)
+- `PHISHSENSE_APP_NAME` overrides the FastAPI title shown in docs
+
 Run locally:
 
 ```bash
