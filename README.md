@@ -32,6 +32,11 @@ Create a `.env` file in the project root:
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
+Optional phishing rule tuning:
+
+- Set `PHISHSENSE_RULES_FILE` to a YAML file, or edit [app/scoring_rules/rules.yaml](app/scoring_rules/rules.yaml#L1)
+- Override individual values with env vars like `PHISHSENSE_URGENT_PATTERNS`, `PHISHSENSE_SCORE_CAP`, or `PHISHSENSE_HIGH_RISK_THRESHOLD`
+
 Run locally:
 
 ```bash

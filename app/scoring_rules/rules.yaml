@@ -1,0 +1,49 @@
+urgent_patterns:
+  - '\burgent\b'
+  - '\bimmediately\b'
+  - '\bverify now\b'
+  - '\bact now\b'
+  - '\bsuspended\b'
+  - '\baccount suspended\b'
+  - '\bpayment failed\b'
+
+credential_patterns:
+  - '\bpassword\b'
+  - '\blog in\b'
+  - '\blogin\b'
+  - '\bsign in\b'
+  - '\bconfirm your account\b'
+  - '\bverify your account\b'
+
+financial_patterns:
+  - '\brefund\b'
+  - '\binvoice\b'
+  - '\bbank\b'
+  - '\bpayment\b'
+  - '\bprize\b'
+  - '\bwinner\b'
+
+shortener_domains:
+  - bit.ly
+  - tinyurl.com
+  - t.co
+  - goo.gl
+  - ow.ly
+  - is.gd
+  - buff.ly
+
+suspicious_tlds:
+  - .ru
+  - .xyz
+  - .top
+  - .click
+  - .shop
+
+score_cap: 100
+high_risk_threshold: 60
+medium_risk_threshold: 30
+
+risk_actions:
+  High: Do not click links or reply. Verify the message through the sender's official website or support channel.
+  Medium: Be cautious. Verify the sender and inspect links carefully before taking any action.
+  Low: No strong phishing indicators were found, but you should still verify unexpected requests independently.
