@@ -111,6 +111,7 @@ This project is for educational and portfolio purposes.
 ## Docs
 
 - Full technical docs: [DEVELOPER_README.md](DEVELOPER_README.md)
+- Project structure guide: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
 - Deployment notes: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## License

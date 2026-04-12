@@ -4,7 +4,7 @@
 
 PhishSense is a FastAPI-based phishing analysis app that combines:
 
-- rule-based detection in `app/scoring.py`
+- modular rule-based detection in `app/scoring_rules/`
 - AI explanation generation in `app/ai_analysis.py`
 - a simple web frontend (`app/templates/index.html`, `static/app.js`, `static/style.css`)
 
@@ -13,10 +13,13 @@ The API endpoint `POST /analyze` returns a normalized response schema for score,
 ## Architecture
 
 - `app/main.py`: FastAPI app, routes, static mount, template rendering
-- `app/scoring.py`: deterministic phishing scoring engine
-- `app/ai_analysis.py`: Gemini-based explanation generation with lazy SDK import
-- `app/schemas.py`: request/response models
-- `tests/test_scoring.py`: core scoring test
+- `app/scoring_rules/engine.py`: deterministic phishing scoring orchestration
+- `app/scoring_rules/config.py`: YAML/env-driven rule configuration loader
+- `app/ai_analysis.py`: Gemini-based explanation generation with safe fallback handling
+- `app/schemas.py`: request/response models and validation
+- `tests/`: scoring, config, validation, and settings tests
+
+See `PROJECT_STRUCTURE.md` for a complete folder-by-folder map.
 
 ## Detection Rules
 
