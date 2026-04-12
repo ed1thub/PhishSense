@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from app.ai_analysis import generate_ai_explanation
 from app.logging_config import configure_logging
 from app.schemas import AnalysisResult, EmailInput
-from app.scoring import analyze_email
+from app.scoring_rules import analyze_email
 from app.settings import get_settings
 
 settings = get_settings()

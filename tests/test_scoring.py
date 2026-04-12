@@ -1,4 +1,4 @@
-from app.scoring import analyze_email
+from app.scoring_rules import analyze_email
 
 
 def test_high_risk_email():
