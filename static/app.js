@@ -34,7 +34,7 @@ Support Team`
         sender: "library@mit.edu.au",
         subject: "Reminder: Library book due next week",
         url: "",
-        body: `Hi Siamul,
+        body: `Hi Jeorge,
 
 This is a reminder that your borrowed library book is due next Tuesday.
 
@@ -140,7 +140,7 @@ function renderResults(data) {
         <div class="score-row">
             <div>
                 <div class="score">Score: ${escapeHtml(data.score)}/100</div>
-                <div class="score-label">AI-generated phishing score</div>
+                <div class="score-label">Phishing score</div>
             </div>
         </div>
 
