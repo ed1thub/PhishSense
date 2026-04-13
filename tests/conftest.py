@@ -13,7 +13,9 @@ def mock_gemini_client(monkeypatch):
 
     class FakeModels:
         def generate_content(self, model: str, contents: str):
-            return types.SimpleNamespace(text="Mocked AI explanation")
+            return types.SimpleNamespace(
+                text='{"score": 68, "risk_level": "High", "red_flags": ["Urgency language", "Credential request"], "recommended_action": "Do not click links. Verify via official support channels.", "ai_explanation": "This email appears suspicious due to urgency and credential-harvesting language."}'
+            )
 
     class FakeClient:
         def __init__(self, api_key: str):

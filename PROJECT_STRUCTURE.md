@@ -53,10 +53,11 @@ This document describes the current repository layout, responsibility boundaries
 
 1. Browser sends payload to `POST /analyze`.
 2. `schemas.EmailInput` validates and normalizes input.
-3. `scoring_rules.engine.analyze_email` calculates score, risk level, red flags, and recommendation.
-4. `ai_analysis.generate_ai_explanation` attempts AI explanation generation with Gemini, then falls back to a polished local explanation if Gemini is unavailable or returns a transient failure.
-5. Result is optionally persisted to SQLite history storage.
-6. Endpoint returns normalized `AnalysisResult` response including explainability rule hits.
+3. `scoring_rules.engine.analyze_email` prepares deterministic fallback values.
+4. `ai_analysis.generate_ai_assessment` asks Gemini for score, risk level, red flags, recommendation, and explanation.
+5. If Gemini is unavailable or returns an invalid payload, fallback values are used.
+6. Result is optionally persisted to SQLite history storage.
+7. Endpoint returns normalized `AnalysisResult` response including explainability rule hits.
 
 ## Configuration Flow
 

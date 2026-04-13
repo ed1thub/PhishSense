@@ -16,7 +16,17 @@ def test_home_page_renders_html():
 def test_analyze_endpoint_returns_expected_shape_for_valid_payload(monkeypatch):
     client = TestClient(app)
 
-    monkeypatch.setattr("app.main.generate_ai_explanation", lambda **kwargs: "Mocked AI explanation")
+    monkeypatch.setattr(
+        "app.main.generate_ai_assessment",
+        lambda **kwargs: {
+            "score": 76,
+            "risk_level": "High",
+            "red_flags": ["Credential request detected", "Urgency pressure"],
+            "recommended_action": "Avoid the link and verify through official support.",
+            "ai_explanation": "This message appears high risk due to urgency and credential prompts.",
+            "source": "ai",
+        },
+    )
 
     payload = {
         "sender": "support@micros0ft-login.com",
@@ -41,7 +51,7 @@ def test_analyze_endpoint_returns_expected_shape_for_valid_payload(monkeypatch):
     assert isinstance(data["score"], int)
     assert isinstance(data["red_flags"], list)
     assert isinstance(data["rule_hits"], list)
-    assert data["ai_explanation"] == "Mocked AI explanation"
+    assert data["ai_explanation"] == "This message appears high risk due to urgency and credential prompts."
 
 
 def test_analyze_endpoint_rejects_invalid_url_scheme():
@@ -86,7 +96,7 @@ def test_analyze_endpoint_handles_ai_failures_safely(monkeypatch):
     def raise_ai_error(**kwargs):
         raise RuntimeError("simulated ai failure")
 
-    monkeypatch.setattr("app.main.generate_ai_explanation", raise_ai_error)
+    monkeypatch.setattr("app.main.generate_ai_assessment", raise_ai_error)
 
     response = client.post(
         "/analyze",
@@ -109,7 +119,17 @@ def test_analyze_endpoint_rate_limits_by_client(monkeypatch):
     monkeypatch.setenv("PHISHSENSE_RATE_LIMIT_ENABLED", "true")
     monkeypatch.setenv("PHISHSENSE_RATE_LIMIT_REQUESTS", "2")
     monkeypatch.setenv("PHISHSENSE_RATE_LIMIT_WINDOW_SECONDS", "60")
-    monkeypatch.setattr("app.main.generate_ai_explanation", lambda **kwargs: "Mocked AI explanation")
+    monkeypatch.setattr(
+        "app.main.generate_ai_assessment",
+        lambda **kwargs: {
+            "score": 42,
+            "risk_level": "Medium",
+            "red_flags": ["Suspicious tone"],
+            "recommended_action": "Verify authenticity through official channels.",
+            "ai_explanation": "Potential phishing indicators were detected.",
+            "source": "ai",
+        },
+    )
 
     payload = {
         "sender": "support@example.com",
@@ -196,7 +216,17 @@ def test_admin_history_returns_saved_analysis(monkeypatch, tmp_path):
     monkeypatch.setenv("PHISHSENSE_HISTORY_ENABLED", "true")
     monkeypatch.setenv("PHISHSENSE_HISTORY_DB_PATH", str(tmp_path / "history.db"))
     monkeypatch.setenv("PHISHSENSE_RATE_LIMIT_ENABLED", "false")
-    monkeypatch.setattr("app.main.generate_ai_explanation", lambda **kwargs: "Mocked AI explanation")
+    monkeypatch.setattr(
+        "app.main.generate_ai_assessment",
+        lambda **kwargs: {
+            "score": 88,
+            "risk_level": "High",
+            "red_flags": ["Impersonation signs", "Credential request"],
+            "recommended_action": "Do not engage; report and verify via official channels.",
+            "ai_explanation": "High likelihood of phishing based on impersonation and credential prompts.",
+            "source": "ai",
+        },
+    )
 
     payload = {
         "sender": "support@micros0ft-login.com",
@@ -216,7 +246,7 @@ def test_admin_history_returns_saved_analysis(monkeypatch, tmp_path):
     first_item = body["items"][0]
     assert first_item["sender"] == payload["sender"]
     assert first_item["subject"] == payload["subject"]
-    assert first_item["ai_explanation"] == "Mocked AI explanation"
+    assert first_item["ai_explanation"] == "High likelihood of phishing based on impersonation and credential prompts."
     assert isinstance(first_item["rule_hits"], list)
 
     detail_response = client.get(f"/admin/history/{first_item['id']}", auth=("admin", "secret"))

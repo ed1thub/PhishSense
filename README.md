@@ -1,10 +1,10 @@
 # PhishSense
 
-PhishSense is a FastAPI web app that analyzes suspicious emails with configurable rule-based phishing detection and Gemini-backed AI-generated explanations.
+PhishSense is a FastAPI web app that analyzes suspicious emails with Gemini-backed AI-generated scoring and explanations, with rule-based fallback for resilience.
 
 ## What It Does
 
-- Scores emails from 0 to 100 based on phishing indicators
+- Scores emails from 0 to 100 using AI risk judgment
 - Labels risk as Low, Medium, or High
 - Shows detected red flags
 - Suggests a safe next action
@@ -89,7 +89,7 @@ Response includes:
 - `score`
 - `risk_level`
 - `red_flags`
-- `rule_hits` (explainability details for each triggered rule)
+- `rule_hits` (fallback explainability details when rule-based backup is used)
 - `ai_explanation` (Gemini output when available; local fallback during transient Gemini errors or outages)
 - `recommended_action`
 

@@ -59,7 +59,7 @@ function renderLoading() {
     results.innerHTML = `
         <div class="loading">
             <div class="spinner"></div>
-            <p class="muted">Analyzing email with rules and Gemini...</p>
+            <p class="muted">Analyzing email with rules and AI...</p>
         </div>
     `;
 }
@@ -140,7 +140,7 @@ function renderResults(data) {
         <div class="score-row">
             <div>
                 <div class="score">Score: ${escapeHtml(data.score)}/100</div>
-                <div class="score-label">Rule-based phishing score</div>
+                <div class="score-label">AI-generated phishing score</div>
             </div>
         </div>
 
@@ -158,7 +158,7 @@ function renderResults(data) {
         </div>
 
         <div class="result-block">
-            <h3>Gemini Explanation</h3>
+            <h3>AI Explanation</h3>
             <div class="ai-box">${escapeHtml(data.ai_explanation)}</div>
         </div>
 

@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.ai_analysis import _build_local_explanation, generate_ai_explanation
+from app.ai_analysis import _build_local_explanation, generate_ai_assessment
 from app.history_store import HistoryStore, model_to_dict
 from app.logging_config import configure_logging
 from app.rate_limit import RateLimiter
@@ -144,7 +144,7 @@ async def home(request: Request):
 async def analyze(payload: EmailInput):
     logger.info("Analyze request received")
 
-    scoring_result = analyze_email(
+    fallback_result = analyze_email(
         sender=payload.sender,
         subject=payload.subject,
         body=payload.body,
@@ -152,33 +152,38 @@ async def analyze(payload: EmailInput):
     )
 
     try:
-        explanation = generate_ai_explanation(
+        ai_result = generate_ai_assessment(
             sender=payload.sender,
             subject=payload.subject,
             body=payload.body,
             url=payload.url,
-            score=scoring_result["score"],
-            risk_level=scoring_result["risk_level"],
-            red_flags=scoring_result["red_flags"],
+            fallback_result=fallback_result,
         )
     except Exception:
-        logger.exception("Unexpected failure during AI explanation generation")
-        explanation = _build_local_explanation(
+        logger.exception("Unexpected failure during AI assessment generation")
+        ai_result = {
+            "score": fallback_result["score"],
+            "risk_level": fallback_result["risk_level"],
+            "red_flags": fallback_result["red_flags"],
+            "recommended_action": fallback_result["recommended_action"],
+            "ai_explanation": _build_local_explanation(
             sender=payload.sender,
             subject=payload.subject,
             url=payload.url,
-            score=scoring_result["score"],
-            risk_level=scoring_result["risk_level"],
-            red_flags=scoring_result["red_flags"],
-        )
+                score=fallback_result["score"],
+                risk_level=fallback_result["risk_level"],
+                red_flags=fallback_result["red_flags"],
+            ),
+            "source": "fallback",
+        }
 
     result = AnalysisResult(
-        score=scoring_result["score"],
-        risk_level=scoring_result["risk_level"],
-        red_flags=scoring_result["red_flags"],
-        rule_hits=scoring_result["rule_hits"],
-        ai_explanation=explanation,
-        recommended_action=scoring_result["recommended_action"],
+        score=ai_result["score"],
+        risk_level=ai_result["risk_level"],
+        red_flags=ai_result["red_flags"],
+        rule_hits=fallback_result["rule_hits"] if ai_result.get("source") == "fallback" else [],
+        ai_explanation=ai_result["ai_explanation"],
+        recommended_action=ai_result["recommended_action"],
     )
 
     store = get_history_store()
