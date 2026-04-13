@@ -20,3 +20,17 @@ def mock_gemini_client(monkeypatch):
             self.models = FakeModels()
 
     monkeypatch.setattr(genai, "Client", FakeClient)
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter_state():
+    from app.main import rate_limiter
+
+    rate_limiter.clear()
+
+
+@pytest.fixture(autouse=True)
+def reset_history_store_state():
+    from app.main import reset_history_store_for_tests
+
+    reset_history_store_for_tests()

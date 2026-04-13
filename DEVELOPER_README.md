@@ -8,7 +8,15 @@ PhishSense is a FastAPI-based phishing analysis app that combines:
 - AI explanation generation in `app/ai_analysis.py`
 - a simple web frontend (`app/templates/index.html`, `static/app.js`, `static/style.css`)
 
-The API endpoint `POST /analyze` returns a normalized response schema for score, risk, red flags, recommendation, and AI explanation.
+The API includes security and operations features:
+
+- request validation with structured 422 responses
+- in-memory rate limiting for `POST /analyze`
+- optional admin mode with HTTP Basic authentication
+- persisted analysis history via SQLite
+- per-rule explainability output (`rule_hits`) with confidence and rationale
+
+Core endpoint: `POST /analyze`
 
 ## Architecture
 
@@ -17,6 +25,10 @@ The API endpoint `POST /analyze` returns a normalized response schema for score,
 - `app/scoring_rules/config.py`: YAML/env-driven rule configuration loader
 - `app/ai_analysis.py`: Gemini-based explanation generation with safe fallback handling
 - `app/schemas.py`: request/response models and validation
+- `app/rate_limit.py`: in-memory per-client throttling
+- `app/security.py`: admin authentication dependency
+- `app/history_store.py`: SQLite persistence for saved analyses
+- `app/settings.py`: centralized env-backed runtime config
 - `tests/`: scoring, config, validation, and settings tests
 
 See `PROJECT_STRUCTURE.md` for a complete folder-by-folder map.
@@ -58,7 +70,7 @@ uvicorn app.main:app --reload
 Run tests:
 
 ```bash
-PYTHONPATH=. pytest -q
+python -m pytest -q
 ```
 
 ## API Contract
@@ -84,16 +96,32 @@ Response:
     "Urgent pressure language detected",
     "Credential or account verification language detected"
   ],
+  "rule_hits": [
+    {
+      "rule_id": "content.credential_request",
+      "signal": "Credential or account verification language detected",
+      "points": 20,
+      "confidence": 0.86,
+      "explanation": "The message asks for login or account verification details, a high-risk phishing indicator."
+    }
+  ],
   "ai_explanation": "...",
   "recommended_action": "Do not click links or reply..."
 }
 ```
 
+Admin endpoints:
+
+- `GET /admin`
+- `GET /admin/history`
+- `GET /admin/history/{id}`
+
 ## Deployment Notes (Render)
 
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Env: `GEMINI_API_KEY`
+- Required env: `GEMINI_API_KEY` (for AI explanations)
+- Optional env: `PHISHSENSE_RATE_LIMIT_*`, `PHISHSENSE_ADMIN_*`, `PHISHSENSE_HISTORY_*`
 
 Important compatibility note:
 
@@ -104,4 +132,6 @@ Important compatibility note:
 
 - Rule-based logic can miss novel phishing patterns.
 - AI explanations are only as reliable as model output.
+- In-memory rate limiting is per-instance and resets on restart.
+- SQLite history is local to instance storage unless backed by persistent volume.
 - This is an educational project, not a complete enterprise email security platform.

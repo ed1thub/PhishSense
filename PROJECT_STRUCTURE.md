@@ -18,6 +18,9 @@ This document describes the current repository layout, responsibility boundaries
 - `ai_analysis.py`: Gemini explanation generation with safe fallback handling
 - `settings.py`: centralized environment-backed settings loader
 - `logging_config.py`: logging bootstrap and formatting
+- `rate_limit.py`: in-memory rate limiter utility
+- `security.py`: HTTP Basic auth dependency for admin routes
+- `history_store.py`: SQLite persistence for saved analysis history
 - `templates/index.html`: UI template rendered for `/`
 
 ### Scoring Subsystem (`app/scoring_rules/`)
@@ -38,9 +41,12 @@ This document describes the current repository layout, responsibility boundaries
 
 ## Tests (`tests/`)
 
+- `conftest.py`: global test fixtures (Gemini mock, limiter/history reset)
 - `test_scoring.py`: baseline scoring behavior
+- `test_scoring_extended.py`: scenario-heavy scoring tests
 - `test_rule_config.py`: rule config precedence and override behavior
 - `test_validation_and_ai.py`: payload validation and AI error safety
+- `test_api_integration.py`: endpoint integration coverage (validation, auth, history)
 - `test_settings.py`: settings defaults and environment override behavior
 
 ## Request Flow
@@ -49,7 +55,8 @@ This document describes the current repository layout, responsibility boundaries
 2. `schemas.EmailInput` validates and normalizes input.
 3. `scoring_rules.engine.analyze_email` calculates score, risk level, red flags, and recommendation.
 4. `ai_analysis.generate_ai_explanation` attempts AI explanation generation.
-5. Endpoint returns normalized `AnalysisResult` response.
+5. Result is optionally persisted to SQLite history storage.
+6. Endpoint returns normalized `AnalysisResult` response including explainability rule hits.
 
 ## Configuration Flow
 
@@ -57,6 +64,8 @@ This document describes the current repository layout, responsibility boundaries
 - Logging is initialized from `PHISHSENSE_LOG_LEVEL`.
 - Scoring rules load from `app/scoring_rules/rules.yaml` by default.
 - `PHISHSENSE_RULES_FILE` and rule-specific env vars override defaults.
+- Rate limiting and admin mode are controlled through `PHISHSENSE_RATE_LIMIT_*` and `PHISHSENSE_ADMIN_*`.
+- History persistence is controlled through `PHISHSENSE_HISTORY_*`.
 
 ## Professional Structure Guidelines
 

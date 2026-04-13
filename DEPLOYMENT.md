@@ -1,66 +1,70 @@
 # PhishSense Deployment Guide
 
-## Deploy to Render.com (Free)
+This guide covers production-minded deployment for the current architecture.
 
-### Step 1: Push to GitHub
-If you haven't already, commit and push your code to GitHub:
-```bash
-git add .
-git commit -m "Prepare for deployment"
-git push origin main
-```
+## Deployment Target
 
-### Step 2: Create Render Account
-1. Go to [render.com](https://render.com)
-2. Sign up with GitHub
-3. Click **"New"** → **"Web Service"**
-4. Select your `PhishSense` repository
-5. Configure:
-   - **Name**: `phishsense` (or your choice)
-   - **Environment**: `Python`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
-   - **Plan**: Free (blue pill)
+PhishSense is designed as a FastAPI web service and is currently configured for Render via [render.yaml](render.yaml).
 
-### Step 3: Add Environment Variables
-1. Scroll down to **Environment** section
-2. Add this variable:
-   - **Key**: `GEMINI_API_KEY`
-   - **Value**: [Your Gemini API key](https://aistudio.google.com/app/apikey)
-3. Click **"Create Web Service"**
+## Render Deployment
 
-### Step 4: Wait for Deployment
-The app will build and deploy automatically. Once done, you'll get a public URL like:
-```
-https://phishsense-xxxxx.onrender.com
-```
+1. Push latest code to GitHub.
+2. In Render, create a new Web Service from this repository.
+3. Confirm service settings:
+- Environment: `Python`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Set environment variables (below).
 
-Share this link with your friends!
+## Required Environment Variables
 
----
+- `GEMINI_API_KEY`: required only if AI explanations should be enabled.
 
-## Alternative: Deploy to Replit (Even Easier)
-If you want the quickest option:
-1. Go to [replit.com](https://replit.com)
-2. Click **"Import from Github"** and select your repo
-3. Add `GEMINI_API_KEY` to the **Secrets** panel
-4. Click **"Run"**
-5. Get a shareable link
+## Recommended Environment Variables
 
----
+### App and Logging
+- `PHISHSENSE_APP_NAME` (default: `PhishSense`)
+- `PHISHSENSE_LOG_LEVEL` (default: `INFO`)
 
-## Notes
-- Render free tier auto-sleeps after 15 min inactivity (wakes on request)
-- Render allows free deployments with 0.5 CPU / 512MB RAM
-- Each friend can use your API key (add rate limiting if needed)
-- To use a production API key, consider upgrading later
+### Rate Limiting
+- `PHISHSENSE_RATE_LIMIT_ENABLED` (default: `true`)
+- `PHISHSENSE_RATE_LIMIT_REQUESTS` (default: `60`)
+- `PHISHSENSE_RATE_LIMIT_WINDOW_SECONDS` (default: `60`)
 
----
+### Admin Mode
+- `PHISHSENSE_ADMIN_MODE_ENABLED` (default: `false`)
+- `PHISHSENSE_ADMIN_USERNAME`
+- `PHISHSENSE_ADMIN_PASSWORD`
 
-## .gitignore Check
-Make sure `.env` is in `.gitignore` so your API key doesn't leak:
-```
-.env
-.venv
-__pycache__
-```
+### History Storage
+- `PHISHSENSE_HISTORY_ENABLED` (default: `true`)
+- `PHISHSENSE_HISTORY_DB_PATH` (default: `phishsense_history.db`)
+- `PHISHSENSE_HISTORY_MAX_RESULTS` (default: `100`)
+
+### Scoring Rules
+- `PHISHSENSE_RULES_FILE` (optional custom YAML)
+- or rule-specific overrides such as `PHISHSENSE_URGENT_PATTERNS`
+
+## Security Notes
+
+- Keep `.env` out of source control.
+- Use strong credentials for admin mode.
+- Keep admin mode disabled unless needed.
+- Treat `/admin` and `/admin/history` as operational endpoints.
+
+## Persistence Notes
+
+- Default history backend is SQLite.
+- On ephemeral containers, local files may be lost on restart/redeploy.
+- For durable history, mount persistent storage or move to an external database.
+
+## Verification Checklist
+
+After deploy, verify:
+
+1. `GET /` returns the UI.
+2. `POST /analyze` returns score + explainability (`rule_hits`).
+3. Rate limiting returns `429` when threshold is exceeded.
+4. Admin mode is inaccessible when disabled.
+5. Admin mode requires Basic auth when enabled.
+6. History endpoints behave correctly when history is enabled.

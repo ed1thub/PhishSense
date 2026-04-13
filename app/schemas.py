@@ -50,5 +50,6 @@ class AnalysisResult(BaseModel):
     score: int = Field(ge=0, le=100)
     risk_level: Literal["Low", "Medium", "High"]
     red_flags: List[str]
+    rule_hits: List[dict]
     ai_explanation: str
     recommended_action: str

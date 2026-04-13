@@ -88,6 +88,24 @@ def test_mismatched_domains_are_flagged():
     assert result["score"] >= 20
 
 
+def test_triggered_rules_include_confidence_and_explanation_output():
+    result = analyze_email(
+        sender="support@micros0ft-login.com",
+        subject="Urgent: Verify your account now",
+        body="Your account is suspended immediately. Log in now and confirm your password.",
+        url="https://bit.ly/fake-login",
+    )
+
+    assert result["rule_hits"]
+    for hit in result["rule_hits"]:
+        assert "rule_id" in hit
+        assert "signal" in hit
+        assert "points" in hit
+        assert "confidence" in hit
+        assert "explanation" in hit
+        assert 0.0 <= hit["confidence"] <= 1.0
+
+
 def test_edge_case_attachment_macro_language_detected():
     result = analyze_email(
         sender="hr@company.com",

@@ -1,8 +1,8 @@
 fastapi
-uvicorn
-jinja2
-python-multipart
-python-dotenv
 google-genai
+jinja2
 pytest
+python-dotenv
+python-multipart
 pyyaml
+uvicorn

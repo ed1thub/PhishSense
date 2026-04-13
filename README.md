@@ -10,6 +10,9 @@ PhishSense is a FastAPI web app that analyzes suspicious emails with configurabl
 - Suggests a safe next action
 - Generates a plain-English explanation with Gemini (when configured)
 - Validates user input and returns field-level 422 errors for bad payloads
+- Applies per-client rate limiting on analysis requests
+- Supports optional admin mode with authenticated operational endpoints
+- Persists analysis history (SQLite by default) for admin review
 
 ## Built With
 
@@ -55,6 +58,15 @@ python -m pytest -q
 - `PHISHSENSE_GEMINI_MODEL`: Gemini model name (default: `gemini-2.5-flash`)
 - `PHISHSENSE_LOG_LEVEL`: Backend logging level (default: `INFO`)
 - `PHISHSENSE_APP_NAME`: FastAPI app title shown in OpenAPI docs
+- `PHISHSENSE_RATE_LIMIT_ENABLED`: Enable or disable API rate limiting for `POST /analyze` (default: `true`)
+- `PHISHSENSE_RATE_LIMIT_REQUESTS`: Max requests allowed per client in window (default: `60`)
+- `PHISHSENSE_RATE_LIMIT_WINDOW_SECONDS`: Rate-limit window in seconds (default: `60`)
+- `PHISHSENSE_ADMIN_MODE_ENABLED`: Enables secure admin endpoint access (default: `false`)
+- `PHISHSENSE_ADMIN_USERNAME`: Username for HTTP Basic authentication on `/admin`
+- `PHISHSENSE_ADMIN_PASSWORD`: Password for HTTP Basic authentication on `/admin`
+- `PHISHSENSE_HISTORY_ENABLED`: Enables saving analysis history (default: `true`)
+- `PHISHSENSE_HISTORY_DB_PATH`: SQLite database path for saved analyses (default: `phishsense_history.db`)
+- `PHISHSENSE_HISTORY_MAX_RESULTS`: Max history rows returned in admin history listing (default: `100`)
 
 ### Scoring Rule Configuration
 
@@ -77,13 +89,39 @@ Response includes:
 - `score`
 - `risk_level`
 - `red_flags`
+- `rule_hits` (explainability details for each triggered rule)
 - `ai_explanation`
 - `recommended_action`
+
+Each `rule_hits` item includes:
+
+- `rule_id`
+- `signal`
+- `points`
+- `confidence` (0.0 to 1.0)
+- `explanation`
 
 Validation behavior:
 
 - Invalid inputs return HTTP 422
 - Response includes `detail` entries with field-specific error messages
+
+Rate limiting behavior:
+
+- `POST /analyze` is rate limited per client IP
+- Exceeded limits return HTTP 429 with `Retry-After` and `retry_after_seconds`
+
+Admin mode behavior:
+
+- `GET /admin` is hidden unless `PHISHSENSE_ADMIN_MODE_ENABLED=true`
+- When enabled, `/admin` requires HTTP Basic authentication
+- `GET /admin/history` returns recent saved analyses
+- `GET /admin/history/{id}` returns a specific saved analysis entry
+
+History behavior:
+
+- Analyses are saved when `PHISHSENSE_HISTORY_ENABLED=true`
+- Default storage is SQLite at `PHISHSENSE_HISTORY_DB_PATH`
 
 ## Project Structure
 
@@ -92,6 +130,9 @@ Validation behavior:
 - [app/ai_analysis.py](app/ai_analysis.py): AI explanation generation with safe fallbacks
 - [app/settings.py](app/settings.py): Centralized environment/settings loader
 - [app/logging_config.py](app/logging_config.py): Logging bootstrap
+- [app/rate_limit.py](app/rate_limit.py): In-memory request throttling
+- [app/security.py](app/security.py): Admin authentication dependency
+- [app/history_store.py](app/history_store.py): SQLite analysis history persistence
 - [tests](tests): Scoring, validation, and settings tests
 
 ## Render Deployment
