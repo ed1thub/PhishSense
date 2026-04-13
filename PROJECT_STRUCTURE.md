@@ -15,7 +15,7 @@ This document describes the current repository layout, responsibility boundaries
 
 - `main.py`: FastAPI app creation, routes, template/static setup, API response handling
 - `schemas.py`: request and response models with input validation rules
-- `ai_analysis.py`: Gemini explanation generation with safe fallback handling
+- `ai_analysis.py`: Gemini explanation generation with safe fallback handling for transient API failures
 - `settings.py`: centralized environment-backed settings loader
 - `logging_config.py`: logging bootstrap and formatting
 - `rate_limit.py`: in-memory rate limiter utility
@@ -54,7 +54,7 @@ This document describes the current repository layout, responsibility boundaries
 1. Browser sends payload to `POST /analyze`.
 2. `schemas.EmailInput` validates and normalizes input.
 3. `scoring_rules.engine.analyze_email` calculates score, risk level, red flags, and recommendation.
-4. `ai_analysis.generate_ai_explanation` attempts AI explanation generation.
+4. `ai_analysis.generate_ai_explanation` attempts AI explanation generation with Gemini, then falls back to a polished local explanation if Gemini is unavailable or returns a transient failure.
 5. Result is optionally persisted to SQLite history storage.
 6. Endpoint returns normalized `AnalysisResult` response including explainability rule hits.
 
@@ -66,6 +66,7 @@ This document describes the current repository layout, responsibility boundaries
 - `PHISHSENSE_RULES_FILE` and rule-specific env vars override defaults.
 - Rate limiting and admin mode are controlled through `PHISHSENSE_RATE_LIMIT_*` and `PHISHSENSE_ADMIN_*`.
 - History persistence is controlled through `PHISHSENSE_HISTORY_*`.
+- Gemini-backed explanations are the primary design point; the app returns a local fallback explanation when Gemini is unavailable or returns a transient failure.
 
 ## Professional Structure Guidelines
 

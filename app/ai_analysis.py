@@ -20,6 +20,36 @@ def _truncate(value: str, limit: int) -> str:
     return f"{value[: limit - 3]}..."
 
 
+def _build_local_explanation(
+    sender: str,
+    subject: str,
+    url: str,
+    score: int,
+    risk_level: str,
+    red_flags: List[str],
+) -> str:
+    lines = [f"Backup assessment: This email scored {score}/100 and was labeled {risk_level} risk."]
+
+    if red_flags:
+        lines.append("Why it looks suspicious:")
+        lines.extend(f"- {flag}" for flag in red_flags[:5])
+    else:
+        lines.append("No major rule-based phishing indicators were detected.")
+
+    if sender:
+        lines.append(f"Sender: {sender}.")
+    if subject:
+        lines.append(f"Subject: {subject}.")
+    if url:
+        lines.append(f"Link: {url}.")
+
+    lines.append(
+        "Recommended next step: verify the request through a trusted official channel before clicking, replying, or entering any information."
+    )
+    lines.append("This local explanation is shown only if Gemini is unavailable.")
+    return "\n".join(lines)
+
+
 def generate_ai_explanation(
     sender: str,
     subject: str,
@@ -31,7 +61,7 @@ def generate_ai_explanation(
 ) -> str:
     settings = get_settings()
     if not settings.gemini_api_key:
-        return "AI explanation is unavailable because GEMINI_API_KEY is not configured."
+        return _build_local_explanation(sender, subject, url, score, risk_level, red_flags)
 
     try:
         # Import lazily so SDK issues don't crash application startup.
@@ -39,7 +69,7 @@ def generate_ai_explanation(
 
     except ImportError:
         logger.exception("Google GenAI SDK is not available")
-        return "AI explanation is temporarily unavailable."
+        return _build_local_explanation(sender, subject, url, score, risk_level, red_flags)
 
     try:
         safe_sender = _truncate(sender, MAX_SENDER_LEN)
@@ -68,10 +98,10 @@ Detected red flags:
 - {flags_text}
 
 Your task:
-1. Explain in plain English why this email may be suspicious.
+1. Write a polished, concise explanation in plain English.
 2. Mention the most important warning signs.
 3. Recommend a safe next action for the user.
-4. Keep the tone calm, clear, and concise.
+4. Keep the tone calm, clear, and professional.
 5. Do not invent details that are not present.
         """.strip()
 
@@ -83,8 +113,8 @@ Your task:
         if hasattr(response, "text") and response.text:
             return response.text.strip()
 
-        return "AI explanation is temporarily unavailable."
+        return _build_local_explanation(sender, subject, url, score, risk_level, red_flags)
 
     except Exception:
         logger.exception("Failed generating AI explanation")
-        return "AI explanation is temporarily unavailable."
+        return _build_local_explanation(sender, subject, url, score, risk_level, red_flags)

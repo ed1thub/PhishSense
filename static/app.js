@@ -59,7 +59,7 @@ function renderLoading() {
     results.innerHTML = `
         <div class="loading">
             <div class="spinner"></div>
-            <p class="muted">Analyzing email with rules and AI...</p>
+            <p class="muted">Analyzing email with rules and Gemini...</p>
         </div>
     `;
 }
@@ -158,7 +158,7 @@ function renderResults(data) {
         </div>
 
         <div class="result-block">
-            <h3>AI Explanation</h3>
+            <h3>Gemini Explanation</h3>
             <div class="ai-box">${escapeHtml(data.ai_explanation)}</div>
         </div>
 

@@ -100,7 +100,7 @@ def test_analyze_endpoint_handles_ai_failures_safely(monkeypatch):
 
     assert response.status_code == 200
     data = response.json()
-    assert data["ai_explanation"] == "AI explanation is temporarily unavailable."
+    assert "This email scored" in data["ai_explanation"]
 
 
 def test_analyze_endpoint_rate_limits_by_client(monkeypatch):

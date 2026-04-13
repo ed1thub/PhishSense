@@ -53,5 +53,5 @@ def test_generate_ai_explanation_does_not_leak_errors(monkeypatch):
         red_flags=["flag"],
     )
 
-    assert result == "AI explanation is temporarily unavailable."
+    assert "This email scored" in result
     assert "sensitive backend details" not in result

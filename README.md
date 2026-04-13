@@ -1,6 +1,6 @@
 # PhishSense
 
-PhishSense is a FastAPI web app that analyzes suspicious emails with configurable rule-based phishing detection and optional AI-generated explanations.
+PhishSense is a FastAPI web app that analyzes suspicious emails with configurable rule-based phishing detection and Gemini-backed AI-generated explanations.
 
 ## What It Does
 
@@ -8,7 +8,7 @@ PhishSense is a FastAPI web app that analyzes suspicious emails with configurabl
 - Labels risk as Low, Medium, or High
 - Shows detected red flags
 - Suggests a safe next action
-- Generates a plain-English explanation with Gemini (when configured)
+- Generates a polished plain-English explanation with Gemini as the primary experience, with a local fallback for transient Gemini outages or 503s
 - Validates user input and returns field-level 422 errors for bad payloads
 - Applies per-client rate limiting on analysis requests
 - Supports optional admin mode with authenticated operational endpoints
@@ -54,7 +54,7 @@ python -m pytest -q
 
 ### Core Settings
 
-- `GEMINI_API_KEY`: Gemini API key used for AI explanation generation
+- `GEMINI_API_KEY`: Gemini API key used for AI explanation generation and the main AI experience
 - `PHISHSENSE_GEMINI_MODEL`: Gemini model name (default: `gemini-2.5-flash`)
 - `PHISHSENSE_LOG_LEVEL`: Backend logging level (default: `INFO`)
 - `PHISHSENSE_APP_NAME`: FastAPI app title shown in OpenAPI docs
@@ -90,7 +90,7 @@ Response includes:
 - `risk_level`
 - `red_flags`
 - `rule_hits` (explainability details for each triggered rule)
-- `ai_explanation`
+- `ai_explanation` (Gemini output when available; local fallback during transient Gemini errors or outages)
 - `recommended_action`
 
 Each `rule_hits` item includes:
@@ -139,7 +139,7 @@ History behavior:
 
 - Build Command: `pip install -r requirements.txt`
 - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Required env var: `GEMINI_API_KEY` (if AI explanations are enabled)
+- Required env var: `GEMINI_API_KEY` (enables the primary Gemini-backed explanations)
 
 ## Student Project Notice
 

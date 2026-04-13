@@ -15,6 +15,7 @@ The API includes security and operations features:
 - optional admin mode with HTTP Basic authentication
 - persisted analysis history via SQLite
 - per-rule explainability output (`rule_hits`) with confidence and rationale
+- polished AI explanation output with Gemini as the primary path and a local rule-based fallback for transient Gemini failures or outages
 
 Core endpoint: `POST /analyze`
 
@@ -110,6 +111,8 @@ Response:
 }
 ```
 
+Note: `ai_explanation` is always populated. The intended product experience is Gemini-backed explanations; when Gemini returns a transient failure such as 503 UNAVAILABLE, the app returns a local rule-based explanation instead of a generic unavailable message.
+
 Admin endpoints:
 
 - `GET /admin`
@@ -120,7 +123,7 @@ Admin endpoints:
 
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Required env: `GEMINI_API_KEY` (for AI explanations)
+- Required env: `GEMINI_API_KEY` (for the intended Gemini-backed explanations)
 - Optional env: `PHISHSENSE_RATE_LIMIT_*`, `PHISHSENSE_ADMIN_*`, `PHISHSENSE_HISTORY_*`
 
 Important compatibility note:
@@ -131,7 +134,7 @@ Important compatibility note:
 ## Known Limitations
 
 - Rule-based logic can miss novel phishing patterns.
-- AI explanations are only as reliable as model output.
+- AI explanations are based on Gemini as the primary experience, with a deterministic local fallback for transient Gemini failures or outages.
 - In-memory rate limiting is per-instance and resets on restart.
 - SQLite history is local to instance storage unless backed by persistent volume.
 - This is an educational project, not a complete enterprise email security platform.

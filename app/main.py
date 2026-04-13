@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.ai_analysis import generate_ai_explanation
+from app.ai_analysis import _build_local_explanation, generate_ai_explanation
 from app.history_store import HistoryStore, model_to_dict
 from app.logging_config import configure_logging
 from app.rate_limit import RateLimiter
@@ -163,7 +163,14 @@ async def analyze(payload: EmailInput):
         )
     except Exception:
         logger.exception("Unexpected failure during AI explanation generation")
-        explanation = "AI explanation is temporarily unavailable."
+        explanation = _build_local_explanation(
+            sender=payload.sender,
+            subject=payload.subject,
+            url=payload.url,
+            score=scoring_result["score"],
+            risk_level=scoring_result["risk_level"],
+            red_flags=scoring_result["red_flags"],
+        )
 
     result = AnalysisResult(
         score=scoring_result["score"],

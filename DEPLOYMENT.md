@@ -18,11 +18,12 @@ PhishSense is designed as a FastAPI web service and is currently configured for 
 
 ## Required Environment Variables
 
-- `GEMINI_API_KEY`: required only if AI explanations should be enabled.
+`GEMINI_API_KEY`: required for the intended Gemini-backed explanation experience. If Gemini returns a transient error such as 503 UNAVAILABLE, the app uses a local rule-based explanation fallback for resilience.
 
 ## Recommended Environment Variables
 
 ### App and Logging
+- In production, configure `GEMINI_API_KEY` so the AI explanation is Gemini-backed.
 - `PHISHSENSE_APP_NAME` (default: `PhishSense`)
 - `PHISHSENSE_LOG_LEVEL` (default: `INFO`)
 
@@ -63,7 +64,7 @@ PhishSense is designed as a FastAPI web service and is currently configured for 
 After deploy, verify:
 
 1. `GET /` returns the UI.
-2. `POST /analyze` returns score + explainability (`rule_hits`).
+2. `POST /analyze` returns score + explainability (`rule_hits`) and a populated `ai_explanation`.
 3. Rate limiting returns `429` when threshold is exceeded.
 4. Admin mode is inaccessible when disabled.
 5. Admin mode requires Basic auth when enabled.
