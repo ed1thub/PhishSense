@@ -7,15 +7,27 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="hero">
-            <h1>PhishSense</h1>
-            <p>Paste a suspicious email and get a phishing score, red flags, and an AI backed explanation.</p>
-        </div>
+    <div class="ambient-glow" aria-hidden="true"></div>
+
+    <main class="container">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Email Security Assistant</p>
+                <h1>PhishSense</h1>
+                <p>Paste a suspicious email and get a phishing score, red flags, and an AI backed explanation.</p>
+            </div>
+            <div class="hero-points" aria-label="App highlights">
+                <p><strong>Fast triage</strong> for risky email content</p>
+                <p><strong>Rule + AI</strong> insights in one view</p>
+            </div>
+        </header>
 
         <div class="layout">
-            <section class="card">
-                <h2>Analyze Email</h2>
+            <section class="card input-card">
+                <div class="card-head">
+                    <h2>Analyze Email</h2>
+                    <p class="muted">Use sample data or paste your own content.</p>
+                </div>
 
                 <div class="sample-actions">
                     <button type="button" class="sample-btn" data-sample="phishing">Load Phishing Sample</button>
@@ -24,13 +36,13 @@
                 </div>
 
                 <label for="sender">Sender Email</label>
-                <input id="sender" type="text" placeholder="support@example.com">
+                <input id="sender" type="text" placeholder="support@example.com" autocomplete="email">
 
                 <label for="subject">Subject</label>
-                <input id="subject" type="text" placeholder="Urgent: Verify your account">
+                <input id="subject" type="text" placeholder="Urgent: Verify your account" autocomplete="off">
 
                 <label for="url">Suspicious URL (optional)</label>
-                <input id="url" type="text" placeholder="https://bit.ly/example">
+                <input id="url" type="text" placeholder="https://bit.ly/example" autocomplete="url">
 
                 <label for="body">Email Body</label>
                 <textarea id="body" rows="12" placeholder="Paste the email body here..."></textarea>
@@ -38,14 +50,17 @@
                 <button id="analyzeBtn" class="primary-btn">Analyze Email</button>
             </section>
 
-            <section class="card">
-                <h2>Results</h2>
+            <section class="card result-card">
+                <div class="card-head">
+                    <h2>Results</h2>
+                    <p class="muted">Analysis output appears after submission.</p>
+                </div>
                 <div id="results" class="results-empty">
                     <p class="muted">Your phishing analysis will appear here.</p>
                 </div>
             </section>
         </div>
-    </div>
+    </main>
 
     <script src="/static/app.js"></script>
 </body>
