@@ -13,6 +13,7 @@ PhishSense is a FastAPI web app that analyzes suspicious emails with Gemini-back
 - Applies per-client rate limiting on analysis requests
 - Supports optional admin mode with authenticated operational endpoints
 - Persists analysis history (SQLite by default) for admin review
+- Provides a modern responsive web UI optimized for desktop and mobile screens
 
 ## Built With
 
@@ -133,6 +134,9 @@ History behavior:
 - [app/rate_limit.py](app/rate_limit.py): In-memory request throttling
 - [app/security.py](app/security.py): Admin authentication dependency
 - [app/history_store.py](app/history_store.py): SQLite analysis history persistence
+- [app/templates/index.html](app/templates/index.html): Main web UI template for `/`
+- [static/style.css](static/style.css): Responsive design system and visual styling
+- [static/app.js](static/app.js): Frontend interactions, validation display, and API rendering
 - [tests](tests): Scoring, validation, and settings tests
 
 ## Render Deployment

@@ -6,6 +6,11 @@ This guide covers production-minded deployment for the current architecture.
 
 PhishSense is designed as a FastAPI web service and is currently configured for Render via [render.yaml](render.yaml).
 
+Frontend note:
+
+- The web UI is server-rendered from `app/templates/index.html` and serves static assets from `static/`.
+- No frontend build pipeline is required for deployment.
+
 ## Render Deployment
 
 1. Push latest code to GitHub.

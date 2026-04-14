@@ -36,8 +36,15 @@ This document describes the current repository layout, responsibility boundaries
 
 ## Frontend Layout (`static/`)
 
-- `app.js`: form submission flow, API handling, result rendering, validation error mapping
-- `style.css`: page styling and validation/error state styles
+- `app.js`: form submission flow, sample loading, API handling, result rendering, and validation error mapping
+- `style.css`: modern responsive design system (layout, typography, cards, forms, result states, motion, and reduced-motion support)
+
+## UI Rendering Flow
+
+1. `GET /` renders `app/templates/index.html`.
+2. The template loads `static/style.css` and `static/app.js`.
+3. Frontend JS submits payloads to `POST /analyze` and updates the results panel in-place.
+4. CSS breakpoints adapt the two-column desktop layout to a stacked mobile layout.
 
 ## Tests (`tests/`)
 
