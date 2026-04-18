@@ -127,11 +127,69 @@ function parseValidationErrors(detail) {
         .filter(Boolean);
 }
 
+function classifyFlag(flag) {
+    const value = String(flag || "").toLowerCase();
+
+    if (/(credential|password|verify|account|suspended|login|domain does not match)/.test(value)) {
+        return { level: "high", label: "Critical" };
+    }
+
+    if (/(shortened|lookalike|unusual|urgent|financial|download|attachment)/.test(value)) {
+        return { level: "medium", label: "Warning" };
+    }
+
+    return { level: "low", label: "Notice" };
+}
+
+function summarizeFlags(flags) {
+    return flags.reduce(
+        (summary, flag) => {
+            const severity = classifyFlag(flag).level;
+            summary[severity] += 1;
+            return summary;
+        },
+        { high: 0, medium: 0, low: 0 }
+    );
+}
+
 function renderResults(data) {
     const badgeClass = data.risk_level.toLowerCase();
-    const flagsHtml = data.red_flags
-        .map(flag => `<li>${escapeHtml(flag)}</li>`)
-        .join("");
+    const score = Number(data.score) || 0;
+    const flags = Array.isArray(data.red_flags) ? data.red_flags : [];
+    const flagSummary = summarizeFlags(flags);
+
+    const indicatorSummaryHtml = `
+        <div class="indicator-grid" aria-label="Flag indicator summary">
+            <article class="indicator-card high">
+                <p class="indicator-label">Critical Indicators</p>
+                <p class="indicator-count">${flagSummary.high}</p>
+            </article>
+            <article class="indicator-card medium">
+                <p class="indicator-label">Warning Indicators</p>
+                <p class="indicator-count">${flagSummary.medium}</p>
+            </article>
+            <article class="indicator-card low">
+                <p class="indicator-label">Notice Indicators</p>
+                <p class="indicator-count">${flagSummary.low}</p>
+            </article>
+        </div>
+    `;
+
+    const flagsHtml = flags.length
+        ? flags
+            .map(flag => {
+                const severity = classifyFlag(flag);
+                return `
+                    <article class="flag-item ${severity.level}">
+                        <span class="flag-level">${escapeHtml(severity.label)}</span>
+                        <p class="flag-text">${escapeHtml(flag)}</p>
+                    </article>
+                `;
+            })
+            .join("")
+        : `
+            <div class="flag-empty">No specific red flags were detected for this message.</div>
+        `;
 
     results.className = "";
     results.innerHTML = `
@@ -139,22 +197,24 @@ function renderResults(data) {
 
         <div class="score-row">
             <div>
-                <div class="score">Score: ${escapeHtml(data.score)}/100</div>
+                <div class="score">Score: ${score}/100</div>
                 <div class="score-label">Phishing score</div>
             </div>
         </div>
 
         <div class="progress-wrap">
             <div class="progress-bar">
-                <div class="progress-fill ${badgeClass}" style="width: ${Math.max(0, Math.min(100, data.score))}%"></div>
+                <div class="progress-fill ${badgeClass}" style="width: ${Math.max(0, Math.min(100, score))}%"></div>
             </div>
         </div>
 
+        ${indicatorSummaryHtml}
+
         <div class="result-block">
-            <h3>Red Flags</h3>
-            <ul class="flag-list">
+            <h3>Flagged Indicators</h3>
+            <div class="flag-grid">
                 ${flagsHtml}
-            </ul>
+            </div>
         </div>
 
         <div class="result-block">

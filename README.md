@@ -7,6 +7,7 @@ PhishSense is a FastAPI web app that analyzes suspicious emails with Gemini-back
 - Scores emails from 0 to 100 using AI risk judgment
 - Labels risk as Low, Medium, or High
 - Shows detected red flags
+- Highlights flagged indicators with severity labels (Critical, Warning, Notice)
 - Suggests a safe next action
 - Generates a polished plain-English explanation with Gemini as the primary experience, with a local fallback for transient Gemini outages or 503s
 - Validates user input and returns field-level 422 errors for bad payloads
@@ -14,6 +15,7 @@ PhishSense is a FastAPI web app that analyzes suspicious emails with Gemini-back
 - Supports optional admin mode with authenticated operational endpoints
 - Persists analysis history (SQLite by default) for admin review
 - Provides a modern responsive web UI optimized for desktop and mobile screens
+- Uses universal UI tuning for Android, iOS, Windows, and macOS (safe areas, touch targets, and reduced-motion support)
 
 ## Built With
 
@@ -161,8 +163,8 @@ History behavior:
 - [app/security.py](app/security.py): Admin authentication dependency
 - [app/history_store.py](app/history_store.py): SQLite analysis history persistence
 - [app/templates/index.html](app/templates/index.html): Main web UI template for `/`
-- [static/style.css](static/style.css): Responsive design system and visual styling
-- [static/app.js](static/app.js): Frontend interactions, validation display, and API rendering
+- [static/style.css](static/style.css): Responsive cross-device design system, severity indicator styling, and accessibility behavior
+- [static/app.js](static/app.js): Frontend interactions, validation display, flagged indicator classification, and API rendering
 - [tests](tests): Scoring, validation, and settings tests
 
 ## Render Deployment

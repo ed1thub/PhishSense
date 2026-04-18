@@ -33,7 +33,7 @@ docker run --rm -p 8000:8000 --env-file .env phishsense
 ### Run with Docker Compose
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 Compose details:
@@ -45,7 +45,7 @@ Compose details:
 Stop compose services:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Required Environment Variables
@@ -97,7 +97,9 @@ After deploy, verify:
 
 1. `GET /` returns the UI.
 2. `POST /analyze` returns score + explainability (`rule_hits`) and a populated `ai_explanation`.
-3. Rate limiting returns `429` when threshold is exceeded.
-4. Admin mode is inaccessible when disabled.
-5. Admin mode requires Basic auth when enabled.
-6. History endpoints behave correctly when history is enabled.
+3. Flagged indicators are visually grouped with severity labels and counts.
+4. UI remains usable on mobile and desktop with responsive stacked layout on narrow screens.
+5. Rate limiting returns `429` when threshold is exceeded.
+6. Admin mode is inaccessible when disabled.
+7. Admin mode requires Basic auth when enabled.
+8. History endpoints behave correctly when history is enabled.
