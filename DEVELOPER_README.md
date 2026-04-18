@@ -25,7 +25,8 @@ Core endpoint: `POST /analyze`
 - `app/templates/index.html` defines a two-panel layout (input and results) with a semantic hero header.
 - `static/style.css` contains the visual design system (CSS variables, typography, cards, buttons, flagged indicator styles, and responsive breakpoints).
 - `static/app.js` preserves all interaction logic for sample loading, validation messages, loading state, result rendering, and flag severity classification.
-- Results include a dedicated flagged-indicator summary with severity counts and per-flag severity chips for faster triage.
+- Results include a dedicated flagged-indicator summary with severity counts and interactive tabs.
+- Indicator details are hidden by default and shown only when a user clicks a severity tab.
 - Responsive behavior is handled in CSS with tablet and mobile breakpoints so input and results stack cleanly on smaller screens.
 - Universal device behavior includes safe-area aware layout spacing, touch-first target sizing, iOS text-size handling, and reduced-motion support.
 

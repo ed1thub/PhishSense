@@ -152,44 +152,58 @@ function summarizeFlags(flags) {
     );
 }
 
+function groupFlagsBySeverity(flags) {
+    return flags.reduce(
+        (grouped, flag) => {
+            const severity = classifyFlag(flag).level;
+            grouped[severity].push(flag);
+            return grouped;
+        },
+        { high: [], medium: [], low: [] }
+    );
+}
+
 function renderResults(data) {
     const badgeClass = data.risk_level.toLowerCase();
     const score = Number(data.score) || 0;
     const flags = Array.isArray(data.red_flags) ? data.red_flags : [];
     const flagSummary = summarizeFlags(flags);
+    const groupedFlags = groupFlagsBySeverity(flags);
+
+    const severityMeta = {
+        high: {
+            title: "Critical Indicators",
+            chipLabel: "Critical",
+            emptyMessage: "No critical indicators found in this message.",
+        },
+        medium: {
+            title: "Warning Indicators",
+            chipLabel: "Warning",
+            emptyMessage: "No warning indicators found in this message.",
+        },
+        low: {
+            title: "Notice Indicators",
+            chipLabel: "Notice",
+            emptyMessage: "No notice indicators found in this message.",
+        },
+    };
 
     const indicatorSummaryHtml = `
         <div class="indicator-grid" aria-label="Flag indicator summary">
-            <article class="indicator-card high">
+            <button type="button" class="indicator-tab indicator-card high" data-severity="high" aria-selected="false">
                 <p class="indicator-label">Critical Indicators</p>
                 <p class="indicator-count">${flagSummary.high}</p>
-            </article>
-            <article class="indicator-card medium">
+            </button>
+            <button type="button" class="indicator-tab indicator-card medium" data-severity="medium" aria-selected="false">
                 <p class="indicator-label">Warning Indicators</p>
                 <p class="indicator-count">${flagSummary.medium}</p>
-            </article>
-            <article class="indicator-card low">
+            </button>
+            <button type="button" class="indicator-tab indicator-card low" data-severity="low" aria-selected="false">
                 <p class="indicator-label">Notice Indicators</p>
                 <p class="indicator-count">${flagSummary.low}</p>
-            </article>
+            </button>
         </div>
     `;
-
-    const flagsHtml = flags.length
-        ? flags
-            .map(flag => {
-                const severity = classifyFlag(flag);
-                return `
-                    <article class="flag-item ${severity.level}">
-                        <span class="flag-level">${escapeHtml(severity.label)}</span>
-                        <p class="flag-text">${escapeHtml(flag)}</p>
-                    </article>
-                `;
-            })
-            .join("")
-        : `
-            <div class="flag-empty">No specific red flags were detected for this message.</div>
-        `;
 
     results.className = "";
     results.innerHTML = `
@@ -212,8 +226,10 @@ function renderResults(data) {
 
         <div class="result-block">
             <h3>Flagged Indicators</h3>
-            <div class="flag-grid">
-                ${flagsHtml}
+            <div class="indicator-instruction" id="indicatorInstruction">
+                Click a tab above to view indicators for that severity level.
+            </div>
+            <div class="flag-grid" id="indicatorDetails" hidden>
             </div>
         </div>
 
@@ -227,6 +243,52 @@ function renderResults(data) {
             <div class="action-box">${escapeHtml(data.recommended_action)}</div>
         </div>
     `;
+
+    const tabs = Array.from(results.querySelectorAll(".indicator-tab"));
+    const instruction = results.querySelector("#indicatorInstruction");
+    const details = results.querySelector("#indicatorDetails");
+
+    function renderSelectedSeverity(severity) {
+        const flagsForSeverity = groupedFlags[severity] || [];
+        const meta = severityMeta[severity];
+
+        tabs.forEach(tab => {
+            const isSelected = tab.dataset.severity === severity;
+            tab.classList.toggle("active", isSelected);
+            tab.setAttribute("aria-selected", String(isSelected));
+        });
+
+        if (!details || !instruction || !meta) {
+            return;
+        }
+
+        instruction.hidden = true;
+        details.hidden = false;
+
+        if (!flagsForSeverity.length) {
+            details.innerHTML = `<div class="flag-empty">${escapeHtml(meta.emptyMessage)}</div>`;
+            return;
+        }
+
+        details.innerHTML = flagsForSeverity
+            .map(flag => `
+                <article class="flag-item ${severity}">
+                    <span class="flag-level">${escapeHtml(meta.chipLabel)}</span>
+                    <p class="flag-text">${escapeHtml(flag)}</p>
+                </article>
+            `)
+            .join("");
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const severity = tab.dataset.severity;
+            if (!severity) {
+                return;
+            }
+            renderSelectedSeverity(severity);
+        });
+    });
 }
 
 sampleButtons.forEach(button => {
