@@ -1,0 +1,19 @@
+services:
+  phishsense:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phishsense
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      PHISHSENSE_HISTORY_DB_PATH: /data/phishsense_history.db
+      PORT: 8000
+    volumes:
+      - phishsense_data:/data
+    restart: unless-stopped
+
+volumes:
+  phishsense_data:

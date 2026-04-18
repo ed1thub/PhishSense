@@ -7,6 +7,9 @@ This document describes the current repository layout, responsibility boundaries
 - `app/`: backend application package (API, analysis, scoring, config)
 - `static/`: frontend assets served by FastAPI
 - `tests/`: automated tests for scoring, validation, and settings
+- `Dockerfile`: container image definition for running the app
+- `docker-compose.yml`: local orchestration with volume-backed persistence
+- `.dockerignore`: Docker build context filtering
 - `README.md`: user-facing setup and usage
 - `DEVELOPER_README.md`: implementation notes and workflow details
 - `DEPLOYMENT.md`, `render.yaml`, `Procfile`: deployment configuration and notes

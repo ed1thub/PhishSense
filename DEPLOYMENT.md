@@ -21,6 +21,33 @@ Frontend note:
 - Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 4. Set environment variables (below).
 
+## Docker Deployment
+
+### Build and Run (Single Container)
+
+```bash
+docker build -t phishsense .
+docker run --rm -p 8000:8000 --env-file .env phishsense
+```
+
+### Run with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+Compose details:
+
+- Maps port `8000:8000`
+- Loads environment variables from `.env`
+- Persists SQLite history at `/data/phishsense_history.db` via volume `phishsense_data`
+
+Stop compose services:
+
+```bash
+docker-compose down
+```
+
 ## Required Environment Variables
 
 `GEMINI_API_KEY`: required for the intended Gemini-backed explanation experience. If Gemini returns a transient error such as 503 UNAVAILABLE, the app uses a local rule-based explanation fallback for resilience.

@@ -51,6 +51,29 @@ Run tests:
 python -m pytest -q
 ```
 
+## Docker Quick Start
+
+Build and run with Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+Open `http://127.0.0.1:8000`.
+
+Stop containers:
+
+```bash
+docker-compose down
+```
+
+Run as a single Docker container:
+
+```bash
+docker build -t phishsense .
+docker run --rm -p 8000:8000 --env-file .env phishsense
+```
+
 ## Configuration
 
 ### Core Settings
@@ -126,6 +149,9 @@ History behavior:
 
 ## Project Structure
 
+- [Dockerfile](Dockerfile): Production-ready Python image for FastAPI app
+- [docker-compose.yml](docker-compose.yml): One-command local container orchestration with persistent app data volume
+- [.dockerignore](.dockerignore): Docker build context optimization and secret/runtime file exclusions
 - [app/main.py](app/main.py): FastAPI app and `/analyze` endpoint
 - [app/scoring_rules](app/scoring_rules): Modular scoring engine and rule configuration
 - [app/ai_analysis.py](app/ai_analysis.py): AI explanation generation with safe fallbacks
@@ -158,6 +184,12 @@ This project is for educational and portfolio purposes.
 - Full technical docs: [DEVELOPER_README.md](DEVELOPER_README.md)
 - Project structure guide: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
 - Deployment notes: [DEPLOYMENT.md](DEPLOYMENT.md)
+
+## CI
+
+- GitHub Actions workflow: [.github/workflows/ci.yml](.github/workflows/ci.yml)
+- Runs on push to `main` and all pull requests
+- Executes Python tests and validates Docker Compose configuration
 
 ## License
 

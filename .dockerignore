@@ -1,0 +1,23 @@
+# VCS and metadata
+.git
+.gitignore
+
+# Local Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+
+# Local env and runtime data
+.env
+phishsense_history.db
+
+# Editor and OS files
+.vscode/
+.DS_Store
+
+# Docs and tests not needed for runtime image
+tests/
+*.md
