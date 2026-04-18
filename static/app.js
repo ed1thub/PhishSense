@@ -59,7 +59,12 @@ function renderLoading() {
     results.innerHTML = `
         <div class="loading">
             <div class="spinner"></div>
-            <p class="muted">Analyzing email with rules and AI...</p>
+            <p class="loading-text">
+                Analyzing email
+                <span class="loading-dots" aria-hidden="true">
+                    <span>.</span><span>.</span><span>.</span>
+                </span>
+            </p>
         </div>
     `;
 }
